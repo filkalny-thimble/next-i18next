@@ -64,7 +64,7 @@ export const appWithTranslation = <Props extends AppProps = AppProps>(
         }),
         lng: locale,
         resources,
-      }).i18n
+      }, configOverride?.key).i18n
 
       globalI18n = instance
 

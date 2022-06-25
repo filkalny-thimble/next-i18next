@@ -6,7 +6,7 @@ import createClient from './createClient'
 
 import { globalI18n } from './appWithTranslation'
 
-import { UserConfig, SSRConfig } from './types'
+import { SSRConfig, UserConfig } from './types'
 import { FallbackLng } from 'i18next'
 
 const DEFAULT_CONFIG_PATH = './next-i18next.config.js'
@@ -72,7 +72,7 @@ export const serverSideTranslations = async (
   const { i18n, initPromise } = createClient({
     ...config,
     lng: initialLocale,
-  })
+  }, configOverride?.key)
 
   await initPromise
 

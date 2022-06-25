@@ -19,6 +19,7 @@ type NextJsI18NConfig = {
 
 export type UserConfig = {
   i18n: NextJsI18NConfig
+  key?: string
   localeExtension?: string
   localePath?:
     string | ((locale: string, namespace: string, missing: boolean) => string)

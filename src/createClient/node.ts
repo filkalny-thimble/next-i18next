@@ -3,19 +3,35 @@ import i18nextFSBackend from 'i18next-fs-backend'
 
 import { InternalConfig, CreateClientReturn, InitPromise, I18n } from '../types'
 
-let globalInstance: I18n
+const globalInstanceKey = Symbol('global i18next instance')
+type GlobalInstanceKey = typeof globalInstanceKey
 
-export default (config: InternalConfig): CreateClientReturn => {
+let globalInstance: I18n
+const keyedGlobalInstances: Record<string, I18n> = {}
+
+export default (
+  config: InternalConfig,
+  instanceKey: string | GlobalInstanceKey = globalInstanceKey
+): CreateClientReturn => {
+  const thisGlobalInstance = instanceKey === globalInstanceKey ? globalInstance
+    : keyedGlobalInstances[instanceKey]
+
   let instance: I18n
-  if (!globalInstance) {
-    globalInstance = i18n.createInstance(config)
-    instance = globalInstance
+  if (!thisGlobalInstance) {
+    instance = i18n.createInstance(config)
   } else {
-    instance = globalInstance.cloneInstance({
+    instance = thisGlobalInstance.cloneInstance({
       ...config,
       initImmediate: false,
     })
   }
+
+  if (instanceKey === globalInstanceKey) {
+    globalInstance = instance
+  } else {
+    keyedGlobalInstances[instanceKey] = instance
+  }
+
   let initPromise: InitPromise
 
   if (!instance.isInitialized) {
