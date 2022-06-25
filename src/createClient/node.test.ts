@@ -37,7 +37,7 @@ describe('createClientNode', () => {
 
   const key = 'key'
   const clientWithKey = createClientNode(config, key)
-  describe('createClientNode a with a key should return create a new instance of i18next', () => {
+  describe('createClientNode a with a key should create a new instance of i18next', () => {
     it('returns a node client', () => {
       expect(typeof clientWithKey.initPromise.then).toEqual('function')
       expect(typeof clientWithKey.i18n.addResource).toEqual('function')

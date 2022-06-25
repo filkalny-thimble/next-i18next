@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import i18nextFSBackend from 'i18next-fs-backend'
 
 import { InternalConfig, CreateClientReturn, InitPromise, I18n } from '../types'
+import { nextI18NextConfig } from '../config/nextI18NextConfig'
 
 const globalInstanceKey = Symbol('global i18next instance')
 type GlobalInstanceKey = typeof globalInstanceKey
@@ -13,6 +14,15 @@ export default (
   config: InternalConfig,
   instanceKey: string | GlobalInstanceKey = globalInstanceKey
 ): CreateClientReturn => {
+  if (instanceKey !== globalInstanceKey) {
+    if (!nextI18NextConfig) {
+      throw new Error('next-i18next was unable to find a user config')
+    }
+    if (!nextI18NextConfig.configOverrideKeys?.includes(instanceKey)) {
+      throw new Error(`next-i18next was unable to find a configOverrideKey matching ${instanceKey}`)
+    }
+  }
+
   const thisGlobalInstance = instanceKey === globalInstanceKey ? globalInstance
     : keyedGlobalInstances[instanceKey]
 

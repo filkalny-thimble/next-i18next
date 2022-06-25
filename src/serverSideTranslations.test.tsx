@@ -1,6 +1,6 @@
 import React from 'react'
 import fs from 'fs'
-import { SSRConfig, UserConfig } from './types'
+import { SSRConfig, UserConfigOverrideSSP } from './types'
 import { serverSideTranslations } from './serverSideTranslations'
 import { globalI18n } from './appWithTranslation'
 import { renderToString } from 'react-dom/server'
@@ -64,7 +64,7 @@ describe('serverSideTranslations', () => {
           defaultLocale: 'en-US',
           locales: ['en-US', 'fr-CA'],
         },
-      } as UserConfig)
+      } as UserConfigOverrideSSP)
       expect(fs.existsSync).toHaveBeenCalledTimes(0)
       expect(fs.readdirSync).toHaveBeenCalledTimes(1)
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/en-US'))
@@ -84,7 +84,7 @@ describe('serverSideTranslations', () => {
           fallbackLng: 'fr',
           locales: ['nl-BE', 'fr-BE'],
         },
-      } as UserConfig)
+      } as UserConfigOverrideSSP)
       expect(fs.readdirSync).toHaveBeenCalledTimes(2)
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/fr'))
       expect(props._nextI18Next.initialI18nStore)
@@ -109,7 +109,7 @@ describe('serverSideTranslations', () => {
           fallbackLng: ['en','fr'],
           locales: ['en-US', 'fr-CA'],
         },
-      } as UserConfig)
+      } as UserConfigOverrideSSP)
       expect(fs.readdirSync).toHaveBeenCalledTimes(3)
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/en-US'))
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/en'))
@@ -144,7 +144,7 @@ describe('serverSideTranslations', () => {
           fallbackLng: {default:['fr'], 'nl-BE':['en']},
           locales: ['nl-BE', 'fr-BE'],
         },
-      } as UserConfig)
+      } as UserConfigOverrideSSP)
       expect(fs.readdirSync).toHaveBeenCalledTimes(3)
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/en'))
       expect(fs.readdirSync).toHaveBeenCalledWith(expect.stringMatching('/public/locales/fr'))
@@ -178,7 +178,7 @@ describe('serverSideTranslations', () => {
         defaultLocale: 'en-US',
         locales: ['en-US', 'fr-CA'],
       },
-    } as UserConfig)
+    } as UserConfigOverrideSSP)
 
     expect(props).toEqual({
       _nextI18Next: {
@@ -209,7 +209,7 @@ describe('serverSideTranslations', () => {
         locales: ['en-US', 'fr-CA'],
       },
       reloadOnPrerender: true,
-    } as UserConfig)
+    } as UserConfigOverrideSSP)
 
     expect(globalI18n?.reloadResources).toHaveBeenCalledTimes(1)
   })
@@ -227,14 +227,14 @@ describe('serverSideTranslations', () => {
         locales: ['en-US', 'fr-CA'],
       },
       reloadOnPrerender: false,
-    } as UserConfig)
+    } as UserConfigOverrideSSP)
 
     expect(globalI18n?.reloadResources).toHaveBeenCalledTimes(0)
   })
 
   it('throws if a function is used for localePath and namespaces are not provided', async () => {
-    const localePathFn: UserConfig['localePath'] = (locale, namespace, missing) => `${missing}/${namespace}/${locale}.json`
-    const config: UserConfig = {
+    const localePathFn: UserConfigOverrideSSP['localePath'] = (locale, namespace, missing) => `${missing}/${namespace}/${locale}.json`
+    const config: UserConfigOverrideSSP = {
       i18n: {
         defaultLocale: 'en',
         locales: ['en'],
