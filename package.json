@@ -1,7 +1,7 @@
 {
   "name": "next-i18next",
-  "version": "11.0.0",
-  "repository": "git@github.com:isaachinman/next-i18next.git",
+  "version": "11.1.0",
+  "repository": "git@github.com:filkalny-thimble/next-i18next.git",
   "author": "Isaac Hinman <isaac@isaachinman.com>",
   "funding": {
     "type": "github",
