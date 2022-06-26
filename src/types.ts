@@ -18,6 +18,7 @@ type NextJsI18NConfig = {
 }
 
 export type UserConfig = {
+  configOverrideKeys?: string[]
   i18n: NextJsI18NConfig
   localeExtension?: string
   localePath?:
@@ -28,7 +29,12 @@ export type UserConfig = {
   use?: any[]
 } & InitOptions
 
-export type InternalConfig = Omit<UserConfig, 'i18n'> & NextJsI18NConfig & {
+export type UserConfigKeyed = UserConfig & { key?: string }
+
+export type UserConfigOverrideSSP = Omit<UserConfigKeyed, 'configOverrideKeys'>
+export type UserConfigOverrideHOC = Omit<UserConfigOverrideSSP, 'key'>
+
+export type InternalConfig = Omit<UserConfigKeyed, 'i18n'> & NextJsI18NConfig & {
   errorStackTraceLimit: number
   fallbackLng: boolean
   // end temporal backwards compatibility WHITELIST REMOVAL
@@ -54,7 +60,7 @@ export type SSRConfig = {
   _nextI18Next: {
     initialI18nStore: any
     initialLocale: string
-    userConfig: UserConfig | null
+    userConfig: UserConfigKeyed | null
   }
 }
 

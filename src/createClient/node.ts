@@ -2,20 +2,46 @@ import i18n from 'i18next'
 import i18nextFSBackend from 'i18next-fs-backend'
 
 import { InternalConfig, CreateClientReturn, InitPromise, I18n } from '../types'
+import { nextI18NextConfig } from '../config/nextI18NextConfig'
+
+const globalInstanceKey = Symbol('global i18next instance')
+type GlobalInstanceKey = typeof globalInstanceKey
 
 let globalInstance: I18n
+const keyedGlobalInstances: Record<string, I18n> = {}
 
-export default (config: InternalConfig): CreateClientReturn => {
+export default (
+  config: InternalConfig,
+  instanceKey: string | GlobalInstanceKey = globalInstanceKey
+): CreateClientReturn => {
+  if (instanceKey !== globalInstanceKey) {
+    if (!nextI18NextConfig) {
+      throw new Error('next-i18next was unable to find a user config')
+    }
+    if (!nextI18NextConfig.configOverrideKeys?.includes(instanceKey)) {
+      throw new Error(`next-i18next was unable to find a configOverrideKey matching ${instanceKey}`)
+    }
+  }
+
+  const thisGlobalInstance = instanceKey === globalInstanceKey ? globalInstance
+    : keyedGlobalInstances[instanceKey]
+
   let instance: I18n
-  if (!globalInstance) {
-    globalInstance = i18n.createInstance(config)
-    instance = globalInstance
+  if (!thisGlobalInstance) {
+    instance = i18n.createInstance(config)
   } else {
-    instance = globalInstance.cloneInstance({
+    instance = thisGlobalInstance.cloneInstance({
       ...config,
       initImmediate: false,
     })
   }
+
+  if (instanceKey === globalInstanceKey) {
+    globalInstance = instance
+  } else {
+    keyedGlobalInstances[instanceKey] = instance
+  }
+
   let initPromise: InitPromise
 
   if (!instance.isInitialized) {

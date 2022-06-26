@@ -6,7 +6,7 @@ import type { AppProps as NextJsAppProps } from 'next/app'
 import { createConfig } from './config/createConfig'
 import createClient from './createClient'
 
-import { SSRConfig, UserConfig } from './types'
+import { SSRConfig, UserConfigKeyed, UserConfigOverrideHOC } from './types'
 
 import { i18n as I18NextClient } from 'i18next'
 export { Trans, useTranslation, withTranslation } from 'react-i18next'
@@ -19,12 +19,12 @@ export let globalI18n: I18NextClient | null = null
 
 export const appWithTranslation = <Props extends AppProps = AppProps>(
   WrappedComponent: React.ComponentType<Props>,
-  configOverride: UserConfig | null = null,
+  configOverride: UserConfigOverrideHOC | null = null,
 ) => {
   const AppWithTranslation = (props: Props) => {
-    const { _nextI18Next } = props.pageProps as SSRConfig
+    const { _nextI18Next } = props.pageProps as Partial<SSRConfig>
     let locale: string | null =
-      _nextI18Next?.initialLocale ?? props?.router?.locale
+      _nextI18Next?.initialLocale ?? props?.router?.locale ?? null
 
     // Memoize the instance and only re-initialize when either:
     // 1. The route changes (non-shallowly)
@@ -33,7 +33,8 @@ export const appWithTranslation = <Props extends AppProps = AppProps>(
     const i18n: I18NextClient | null = useMemo(() => {
       if (!_nextI18Next && !configOverride) return null
 
-      let userConfig = configOverride ?? _nextI18Next?.userConfig
+      let userConfig: UserConfigKeyed | null =
+        configOverride ?? _nextI18Next?.userConfig ?? null
 
       if (!userConfig && configOverride === null) {
         throw new Error('appWithTranslation was called without a next-i18next config')
@@ -64,7 +65,7 @@ export const appWithTranslation = <Props extends AppProps = AppProps>(
         }),
         lng: locale,
         resources,
-      }).i18n
+      }, _nextI18Next?.userConfig?.key).i18n
 
       globalI18n = instance
 

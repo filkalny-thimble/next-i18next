@@ -6,10 +6,9 @@ import createClient from './createClient'
 
 import { globalI18n } from './appWithTranslation'
 
-import { UserConfig, SSRConfig } from './types'
+import { SSRConfig, UserConfigOverrideSSP } from './types'
 import { FallbackLng } from 'i18next'
-
-const DEFAULT_CONFIG_PATH = './next-i18next.config.js'
+import { nextI18NextConfig } from './config/nextI18NextConfig'
 
 const getFallbackLocales = (fallbackLng: false | FallbackLng) => {
   if (typeof fallbackLng === 'string') {
@@ -37,7 +36,7 @@ const flatNamespaces = (namespacesByLocale: string[][]) => {
 export const serverSideTranslations = async (
   initialLocale: string,
   namespacesRequired: string[] | undefined = undefined,
-  configOverride: UserConfig | null = null,
+  configOverride: UserConfigOverrideSSP | null = null,
 ): Promise<SSRConfig> => {
   if (typeof initialLocale !== 'string') {
     throw new Error('Initial locale argument was not passed into serverSideTranslations')
@@ -45,8 +44,8 @@ export const serverSideTranslations = async (
 
   let userConfig = configOverride
 
-  if (!userConfig && fs.existsSync(path.resolve(DEFAULT_CONFIG_PATH))) {
-    userConfig = await import(path.resolve(DEFAULT_CONFIG_PATH))
+  if (!userConfig) {
+    userConfig = nextI18NextConfig
   }
 
   if (userConfig === null) {
@@ -72,7 +71,7 @@ export const serverSideTranslations = async (
   const { i18n, initPromise } = createClient({
     ...config,
     lng: initialLocale,
-  })
+  }, configOverride?.key)
 
   await initPromise
 
