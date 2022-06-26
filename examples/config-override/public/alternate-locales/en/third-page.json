@@ -1,0 +1,6 @@
+{
+  "h1": "A third page, to demonstrate config overrides",
+  "reload-resources": "Reload resources",
+  "back-to-second-page": "Back to second page",
+  "title": "Third page | next-i18next"
+}
